@@ -14,7 +14,8 @@ class PyramidROIAlign(tf.keras.layers.Layer):
                 Example: (7, 7)
         '''
         super(PyramidROIAlign, self).__init__(**kwargs)
-
+        
+        # pool_shape是在特征图上抠出的图像的尺寸，无论边框尺寸有多大最后抠出的特征图都转化为7*7的尺寸
         self.pool_shape = tuple(pool_shape)
 
     def call(self, inputs, training=True):
