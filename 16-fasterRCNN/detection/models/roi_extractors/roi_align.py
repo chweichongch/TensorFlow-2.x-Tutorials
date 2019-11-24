@@ -1,3 +1,12 @@
+'''
+
+
+
+
+'''
+
+
+
 import tensorflow as tf
 
 from detection.utils.misc import *
@@ -50,7 +59,7 @@ class PyramidROIAlign(tf.keras.layers.Layer):
             dtype=tf.float32
         )#[1216*1216, 1216*1216,...], shape:[2000]
 
-
+        # 2000个roi边框的位置信息
         rois = tf.concat(rois_list, axis=0) # [2000, 4]
         
         # Assign each ROI to a level in the pyramid based on the ROI area.
@@ -62,6 +71,7 @@ class PyramidROIAlign(tf.keras.layers.Layer):
         # the fact that our coordinates are normalized here.
         # e.g. a 224x224 ROI (in pixels) maps to P4
 
+        # roi_level保存了2000个roi边框所归属的level的id
         roi_level = tf.math.log( # [2000]
                     tf.sqrt(tf.squeeze(h * w, 1))
                     / tf.cast((224.0 / tf.sqrt(areas * 1.0)), tf.float32)
@@ -118,7 +128,13 @@ class PyramidROIAlign(tf.keras.layers.Layer):
         ix = tf.nn.top_k(sorting_tensor, k=tf.shape( # k=2000
             roi_to_level)[0]).indices[::-1]# reverse the order
         ix = tf.gather(roi_to_level[:, 1], ix) # [2000]
+        
+        # 按照ix提供的索引收集pooled_rois
         pooled_rois = tf.gather(pooled_rois, ix) # [2000, 7, 7, 256]
+        
         # 2000 of [7, 7, 256]
+        # 把pooled_rois切开，切成2000份，每份的尺寸是[7, 7, 256]
         pooled_rois_list = tf.split(pooled_rois, num_rois_list, axis=0)
+        
+        # pooled_rois_list是2000个roi边框所对应的特征图，所有特征图都resize为了7*7
         return pooled_rois_list
