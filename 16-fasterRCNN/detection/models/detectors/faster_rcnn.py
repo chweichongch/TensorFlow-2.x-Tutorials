@@ -113,15 +113,15 @@ class FasterRCNN(tf.keras.Model, RPNTestMixin, BBoxTestMixin):
         训练：图像imgs，img_metas, gt_boxes真实边框的位置最多14个框, 真实边框的种类最多14个框 
         预测：图像imgs，img_metas
         
-        用backbone函数得到C2，C3，C4，C5几个不同感受野的特征图
+        图像imgs输入到backbone函数里，用backbone函数得到C2，C3，C4，C5几个不同感受野的特征图
         
         将C2，C3，C4，C5输入到neck函数里得到FPN输出的P2, P3, P4, P5, P6几个不同的感受野的特征图
         
         rpn_feature_maps = [P2, P3, P4, P5, P6]为rpn的特征图集合
         rcnn_feature_maps = [P2, P3, P4, P5]为rcnn的特征图集合
         
-        将rpn的特征图集合输入到rpn_head函数里得到rpn网络输出的穷举边框的分类效用rpn_class_logits，穷举边框的分类概率rpn_probs，
-        穷举边框的位置rpn_deltas
+        将rpn的特征图集合[P2, P3, P4, P5, P6]输入到rpn_head函数里得到rpn网络输出的穷举边框的分类效用rpn_class_logits，
+        穷举边框的分类概率rpn_probs，穷举边框的位置rpn_deltas
         
         将穷举边框的分类概率rpn_probs，穷举边框的位置rpn_deltas输入到rpn_head.get_proposals函数里得到选取的建议边框名单proposals_list
         
