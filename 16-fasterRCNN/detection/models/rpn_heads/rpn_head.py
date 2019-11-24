@@ -149,7 +149,7 @@ class RPNHead(tf.keras.Model):
             layer_outputs.append([rpn_class_logits, rpn_probs, rpn_deltas])
             # print(rpn_class_logits.shape, rpn_probs.shape, rpn_deltas.shape)
             """
-            FPN有5个不同感受野的特征图，每个特征图有logit值，分类（2分类）值，以及边框坐标
+            FPN有5个不同感受野的特征图，每个特征图有logit值，分类（2分类）值，以及边框坐标（用delt如何计算边框坐标？）
             每个特征图上的像素点拥有三个不同尺寸的边框
             layer_outputs的尺寸如下：
             
