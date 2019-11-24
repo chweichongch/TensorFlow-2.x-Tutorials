@@ -121,7 +121,8 @@ class FasterRCNN(tf.keras.Model, RPNTestMixin, BBoxTestMixin):
         rcnn_feature_maps = [P2, P3, P4, P5]为rcnn的特征图集合
         
         将rpn的特征图集合[P2, P3, P4, P5, P6]输入到rpn_head函数里得到rpn网络输出的穷举边框的分类效用rpn_class_logits，
-        穷举边框的分类概率rpn_probs，穷举边框的位置rpn_deltas
+        穷举边框的分类概率rpn_probs，穷举边框的位置rpn_deltas，返回的这些边框的信息是FPN的5种特征图上所有的边框的信息
+        （特征图每个像素点对应3个边框，一共有369303个边框）
         
         将穷举边框的分类概率rpn_probs，穷举边框的位置rpn_deltas输入到rpn_head.get_proposals函数里得到选取的建议边框名单proposals_list
         
