@@ -101,6 +101,7 @@ class RPNHead(tf.keras.Model):
         
         for feat in inputs: # for every anchors feature maps
             """
+            以下是5种特征图的尺寸
             (1, 304, 304, 256)
             (1, 152, 152, 256)
             (1, 76, 76, 256)
@@ -129,15 +130,17 @@ class RPNHead(tf.keras.Model):
 
             """
             # print(feat.shape)
+            # 输入的特征图先通过一个3*3卷积，用padding不改变feature的尺寸
             shared = self.rpn_conv_shared(feat)
             shared = tf.nn.relu(shared)
-
+            # 再通过一个1*1卷积得到feat上每个像素点的分类概率
             x = self.rpn_class_raw(shared)
             # print('rpn_class_raw:', x.shape)
             rpn_class_logits = tf.reshape(x, [tf.shape(x)[0], -1, 2])
             rpn_probs = tf.nn.softmax(rpn_class_logits)
             # print('rpn_class_logits:', rpn_class_logits.shape)
-
+            
+            # 通过一个1*1卷积得到feat上每个像素点的边框的坐标（每个点有3个边框？）
             x = self.rpn_delta_pred(shared)
             # print('rpn_delta_pred:', x.shape)
             rpn_deltas = tf.reshape(x, [tf.shape(x)[0], -1, 4])
@@ -146,6 +149,10 @@ class RPNHead(tf.keras.Model):
             layer_outputs.append([rpn_class_logits, rpn_probs, rpn_deltas])
             # print(rpn_class_logits.shape, rpn_probs.shape, rpn_deltas.shape)
             """
+            FPN有5个不同感受野的特征图，每个特征图有logit值，分类（2分类）值，以及边框坐标
+            每个特征图上的像素点拥有三个不同尺寸的边框
+            layer_outputs的尺寸如下：
+            
             (1, 277248, 2) (1, 277248, 2) (1, 277248, 4)
             (1, 69312, 2) (1, 69312, 2) (1, 69312, 4)
             (1, 17328, 2) (1, 17328, 2) (1, 17328, 4)
@@ -158,6 +165,7 @@ class RPNHead(tf.keras.Model):
         outputs = list(zip(*layer_outputs))
         outputs = [tf.concat(list(o), axis=1) for o in outputs]
         rpn_class_logits, rpn_probs, rpn_deltas = outputs
+        # 5种特征图的像素点之和为369303
         # (1, 369303, 2) (1, 369303, 2) (1, 369303, 4)
         # print(rpn_class_logits.shape, rpn_probs.shape, rpn_deltas.shape)
         
