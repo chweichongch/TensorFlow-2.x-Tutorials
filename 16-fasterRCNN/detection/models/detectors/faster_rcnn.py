@@ -127,6 +127,8 @@ class FasterRCNN(tf.keras.Model, RPNTestMixin, BBoxTestMixin):
         每个穷举出来的边框有中心坐标（在特征图中像素点对应原图部分的中心）以及四个角的坐标（原图像素坐标）
         
         将穷举边框的分类概率rpn_probs，穷举边框的位置rpn_deltas输入到rpn_head.get_proposals函数里得到选取的建议边框名单proposals_list
+        从369303个边框先根据二分类概率选出6000个边框，让后再用tf.image.non_max_suppression选出2000个proposal边框
+        
         
         输入建议边框名单rois_list = proposals_list, rcnn的特征图集合rcnn_feature_maps, img_metas到roi_align函数里得到了
         从原特征图上为每个建议边框抠出来的子特征图集合pooled_regions_list，每张子图的尺寸被resize为了[7,7]
